@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import com.remote.app.billing.BillingManager
+import com.remote.app.connection.TVConnectionManager
 import com.remote.app.network.TVDiscoveryManager
 import dagger.Module
 import dagger.Provides
