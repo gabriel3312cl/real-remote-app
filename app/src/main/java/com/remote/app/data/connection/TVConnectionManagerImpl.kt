@@ -14,6 +14,7 @@ import com.remote.app.domain.repository.TVConnectionRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ class TVConnectionManagerImpl @Inject constructor(
 
     private var androidRemoteTv: AndroidRemoteTv? = null
     private var connectedTv: DiscoveredTV? = null
+    private var connectJob: Job? = null
 
     init {
         AndroidRemoteContext.getInstance().initialize(context)
@@ -40,13 +42,27 @@ class TVConnectionManagerImpl @Inject constructor(
     }
 
     override fun connectToTv(tv: DiscoveredTV, scope: CoroutineScope) {
+        // Clean up any previous session first
+        val oldRemote = androidRemoteTv
+        connectJob?.cancel()
+        androidRemoteTv = null
+
         connectedTv = tv
         _connectionState.value = ConnectionState.CONNECTING
 
-        androidRemoteTv = AndroidRemoteTv()
-        scope.launch(Dispatchers.IO) {
+        // Disconnect old session in background
+        if (oldRemote != null) {
+            scope.launch(Dispatchers.IO) {
+                try { oldRemote.disconnect() } catch (_: Exception) {}
+            }
+        }
+
+        val newRemote = AndroidRemoteTv()
+        androidRemoteTv = newRemote
+
+        connectJob = scope.launch(Dispatchers.IO) {
             try {
-                androidRemoteTv?.connect(tv.host, object : AndroidTvListener {
+                newRemote.connect(tv.host, object : AndroidTvListener {
                     override fun onSessionCreated() {}
                     override fun onSecretRequested() {
                         _connectionState.value = ConnectionState.PAIRING_PIN_REQUESTED
@@ -104,11 +120,19 @@ class TVConnectionManagerImpl @Inject constructor(
     }
 
     override fun disconnect(scope: CoroutineScope) {
-        scope.launch(Dispatchers.IO) {
-            androidRemoteTv?.disconnect()
-        }
+        val remote = androidRemoteTv
+        connectJob?.cancel()
+        connectJob = null
+        androidRemoteTv = null
         connectedTv = null
         _connectionState.value = ConnectionState.DISCONNECTED
+        scope.launch(Dispatchers.IO) {
+            try {
+                remote?.disconnect()
+            } catch (e: Exception) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "disconnect error", e)
+            }
+        }
     }
 
     override fun resetState() {
