@@ -187,6 +187,13 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(strings.connecting)
+                            Spacer(modifier = Modifier.height(24.dp))
+                            OutlinedButton(
+                                onClick = { viewModel.cancelPairing() },
+                                modifier = Modifier.fillMaxWidth().height(56.dp)
+                            ) {
+                                Text(strings.back, fontSize = 18.sp)
+                            }
                         }
                         ConnectionState.CONNECTED -> {
                             RemoteControlPad(viewModel)
