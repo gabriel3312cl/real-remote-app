@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.billingclient.api.BillingClient
+import com.remote.app.domain.AppConstants
+import com.remote.app.domain.BillingConstants
 import com.remote.app.i18n.AppLanguage
 import com.remote.app.presentation.RemoteViewModel
 import com.remote.app.presentation.theme.LocalAppStrings
@@ -34,7 +36,7 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
                 title = { Text(strings.settings) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = strings.back)
                     }
                 }
             )
@@ -92,7 +94,7 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
                     },
                     confirmButton = {
                         TextButton(onClick = { showLanguageDialog = false }) {
-                            Text("OK")
+                            Text(strings.ok)
                         }
                     }
                 )
@@ -109,28 +111,28 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/account/subscriptions?package=${activity.packageName}"))
                     activity.startActivity(intent)
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
-                    Text("Manage Subscription")
+                    Text(strings.manageSubscription)
                 }
             } else {
                 Text(strings.proVersion, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
                 Text(strings.buyProDesc, color = Color.Gray, modifier = Modifier.padding(vertical = 8.dp))
 
                 Button(onClick = {
-                    viewModel.billingRepository.buyProduct(activity, "pro_lifetime_399", BillingClient.ProductType.INAPP)
+                    viewModel.billingRepository.buyProduct(activity, BillingConstants.PRODUCT_LIFETIME, BillingClient.ProductType.INAPP)
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
-                    Text("${strings.proVersion} (Lifetime $3.99)")
+                    Text(strings.proLifetime)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(onClick = {
-                    viewModel.billingRepository.buyProduct(activity, "pro_monthly_099", BillingClient.ProductType.SUBS)
+                    viewModel.billingRepository.buyProduct(activity, BillingConstants.PRODUCT_MONTHLY, BillingClient.ProductType.SUBS)
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
-                    Text("Pro Subscription ($1.00/mo)")
+                    Text(strings.proSubscription)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedButton(onClick = {
                     viewModel.billingRepository.restorePurchases()
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
-                    Text("Restore Purchases")
+                    Text(strings.restorePurchases)
                 }
             }
 
@@ -138,8 +140,8 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
 
             Text(strings.about, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("${strings.developer}: Squir", color = Color.Gray)
-            Text("${strings.website}: https://realremote.app", color = Color(0xFF64B5F6))
+            Text("${strings.developer}: ${AppConstants.DEVELOPER_NAME}", color = Color.Gray)
+            Text("${strings.website}: ${AppConstants.WEBSITE_URL}", color = Color(0xFF64B5F6))
             Spacer(modifier = Modifier.height(32.dp))
         }
     }

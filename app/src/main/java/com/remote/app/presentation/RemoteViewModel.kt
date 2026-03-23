@@ -3,6 +3,7 @@ package com.remote.app.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kunal52.remote.Remotemessage
+import com.remote.app.domain.AppConstants
 import com.remote.app.domain.model.ConnectionState
 import com.remote.app.domain.model.DiscoveredTV
 import com.remote.app.domain.repository.BillingRepository
@@ -48,7 +49,7 @@ class RemoteViewModel @Inject constructor(
             if (_isScanning.value) return@launch
             _isScanning.value = true
             tvDiscoveryRepository.startDiscovery()
-            kotlinx.coroutines.delay(5000)
+            kotlinx.coroutines.delay(AppConstants.SCAN_DURATION_MS)
             tvDiscoveryRepository.stopDiscovery()
             _isScanning.value = false
         }
@@ -65,6 +66,10 @@ class RemoteViewModel @Inject constructor(
 
     fun providePairingPin(pin: String) {
         tvConnectionRepository.sendSecret(pin, viewModelScope)
+    }
+
+    fun cancelPairing() {
+        tvConnectionRepository.disconnect(viewModelScope)
     }
 
     fun sendCommand(keyCode: Remotemessage.RemoteKeyCode) {

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.remote.app.domain.AppConstants
 import com.remote.app.domain.model.ConnectionState
 import com.remote.app.i18n.getAppStrings
 import com.remote.app.presentation.RemoteViewModel
@@ -70,7 +71,7 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
             Scaffold(
                 topBar = {
                     TopAppBar(
-                        title = { Text("Minimal TV Remote") },
+                        title = { Text(AppConstants.APP_NAME) },
                         actions = {
                             IconButton(onClick = { currentScreen = Screen.SETTINGS }) {
                                 Icon(Icons.Default.Settings, contentDescription = strings.settings)
@@ -126,7 +127,7 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
                             } else {
                                 discoveredTVs.forEach { tv ->
                                     val diff = currentTime - tv.lastSeenMillis
-                                    val isOnline = tv.lastSeenMillis > 0L && diff < 120_000L
+                                    val isOnline = tv.lastSeenMillis > 0L && diff < AppConstants.ONLINE_THRESHOLD_MS
 
                                     val timeString = when {
                                         tv.lastSeenMillis == 0L -> strings.never
@@ -174,11 +175,18 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
                             Button(onClick = { viewModel.providePairingPin(pin) }, modifier = Modifier.fillMaxWidth().height(56.dp)) {
                                 Text(strings.pair, fontSize = 18.sp)
                             }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            OutlinedButton(
+                                onClick = { viewModel.cancelPairing() },
+                                modifier = Modifier.fillMaxWidth().height(56.dp)
+                            ) {
+                                Text(strings.back, fontSize = 18.sp)
+                            }
                         }
                         ConnectionState.CONNECTING -> {
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("Connecting...")
+                            Text(strings.connecting)
                         }
                         ConnectionState.CONNECTED -> {
                             RemoteControlPad(viewModel)

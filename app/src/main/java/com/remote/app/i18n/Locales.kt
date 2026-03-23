@@ -52,7 +52,15 @@ data class AppStrings(
     val language: String,
     val systemDefault: String,
     val proVersion: String,
-    val buyProDesc: String
+    val buyProDesc: String,
+    val connecting: String,
+    val ok: String,
+    val manageSubscription: String,
+    val restorePurchases: String,
+    val proLifetime: String,
+    val proSubscription: String,
+    val back: String,
+    val home: String
 )
 
 val enUsStrings = AppStrings(
@@ -62,7 +70,10 @@ val enUsStrings = AppStrings(
     disconnect = "Disconnect", power = "Power", enterPinPrompt = "Please enter the PIN displayed on your TV:",
     pair = "Pair", settings = "Settings", about = "About", developer = "Developer", website = "Website",
     language = "Language", systemDefault = "System Default",
-    proVersion = "Pro Version", buyProDesc = "Remove ads forever with a one-time purchase or monthly sub."
+    proVersion = "Pro Version", buyProDesc = "Remove ads forever with a one-time purchase or monthly sub.",
+    connecting = "Connecting...", ok = "OK", manageSubscription = "Manage Subscription",
+    restorePurchases = "Restore Purchases", proLifetime = "Pro (Lifetime \$3.99)",
+    proSubscription = "Pro Subscription (\$1.00/mo)", back = "Back", home = "Home"
 )
 
 val enUkStrings = enUsStrings.copy(scanForTvs = "Search for TVs", noTvsFound = "No TVs found. Press Search to locate devices on your network.")
@@ -83,7 +94,10 @@ val esEsStrings = AppStrings(
     disconnect = "Desconectar", power = "Apagar", enterPinPrompt = "Por favor, introduce el PIN mostrado en tu TV:",
     pair = "Emparejar", settings = "Ajustes", about = "Acerca de", developer = "Desarrollador", website = "Sitio Web",
     language = "Idioma", systemDefault = "Por defecto del sistema",
-    proVersion = "Versión Pro", buyProDesc = "Elimina la publicidad para siempre con un pago único o mensual."
+    proVersion = "Versión Pro", buyProDesc = "Elimina la publicidad para siempre con un pago único o mensual.",
+    connecting = "Conectando...", ok = "OK", manageSubscription = "Gestionar suscripción",
+    restorePurchases = "Restaurar compras", proLifetime = "Pro (De por vida \$3.99)",
+    proSubscription = "Suscripción Pro (\$1.00/mes)", back = "Atrás", home = "Inicio"
 )
 val es419Strings = esEsStrings.copy(scanForTvs = "Escanear TVs", noTvsFound = "No se encontraron TVs. Presiona Escanear para hallar dispositivos en la red.", settings = "Configuración")
 val esUsStrings = es419Strings.copy(enterPinPrompt = "Por favor ingrese el PIN de la TV:")
@@ -94,7 +108,10 @@ val frStrings = AppStrings(
     minsAgo = { "Il y a ${it}m" }, hoursAgo = { "Il y a ${it}h" }, daysAgo = { "Il y a ${it}j" },
     disconnect = "Déconnecter", power = "Éteindre", enterPinPrompt = "Veuillez entrer le code PIN affiché sur la TV:",
     pair = "Associer", settings = "Paramètres", about = "À propos", developer = "Développeur", website = "Site Web",
-    language = "Langue", systemDefault = "Par défaut", proVersion = "Version Pro", buyProDesc = "Supprimez les publicités pour toujours."
+    language = "Langue", systemDefault = "Par défaut", proVersion = "Version Pro", buyProDesc = "Supprimez les publicités pour toujours.",
+    connecting = "Connexion...", ok = "OK", manageSubscription = "Gérer l'abonnement",
+    restorePurchases = "Restaurer les achats", proLifetime = "Pro (À vie \$3.99)",
+    proSubscription = "Abonnement Pro (\$1.00/mois)", back = "Retour", home = "Accueil"
 )
 
 val ptPtStrings = AppStrings(
@@ -103,7 +120,10 @@ val ptPtStrings = AppStrings(
     minsAgo = { "Há ${it}m" }, hoursAgo = { "Há ${it}h" }, daysAgo = { "Há ${it}d" },
     disconnect = "Desconectar", power = "Desligar", enterPinPrompt = "Por favor, insira o PIN exibido na TV:",
     pair = "Emparelhar", settings = "Definições", about = "Sobre", developer = "Programador", website = "Website",
-    language = "Idioma", systemDefault = "Predefinição do sistema", proVersion = "Versão Pro", buyProDesc = "Remova anúncios para sempre."
+    language = "Idioma", systemDefault = "Predefinição do sistema", proVersion = "Versão Pro", buyProDesc = "Remova anúncios para sempre.",
+    connecting = "A ligar...", ok = "OK", manageSubscription = "Gerir subscrição",
+    restorePurchases = "Restaurar compras", proLifetime = "Pro (Vitalício \$3.99)",
+    proSubscription = "Subscrição Pro (\$1.00/mês)", back = "Voltar", home = "Início"
 )
 val ptBrStrings = ptPtStrings.copy(scanForTvs = "Escanear TVs", scanning = "Escaneando...", noTvsFound = "Nenhuma TV encontrada. Pressione Escanear.", settings = "Configurações", developer = "Desenvolvedor")
 
@@ -113,7 +133,10 @@ val zhCnStrings = AppStrings(
     minsAgo = { "${it}分钟前" }, hoursAgo = { "${it}小时前" }, daysAgo = { "${it}天前" },
     disconnect = "断开连接", power = "电源", enterPinPrompt = "请输入电视上显示的 PIN 码：",
     pair = "配对", settings = "设置", about = "关于", developer = "开发者", website = "网站",
-    language = "语言", systemDefault = "系统默认", proVersion = "专业版", buyProDesc = "一次性购买彻底移除广告。"
+    language = "语言", systemDefault = "系统默认", proVersion = "专业版", buyProDesc = "一次性购买彻底移除广告。",
+    connecting = "连接中...", ok = "确定", manageSubscription = "管理订阅",
+    restorePurchases = "恢复购买", proLifetime = "专业版 (终身 \$3.99)",
+    proSubscription = "专业版订阅 (\$1.00/月)", back = "返回", home = "主页"
 )
 val zhTwStrings = zhCnStrings.copy(
     scanForTvs = "掃描電視", scanning = "掃描中...", noTvsFound = "未找到電視。請按掃描查找網路上的設備。",
@@ -131,7 +154,10 @@ val viStrings = AppStrings(
     minsAgo = { "${it}p trước" }, hoursAgo = { "${it}g trước" }, daysAgo = { "${it}n trước" },
     disconnect = "Ngắt kết nối", power = "Nguồn", enterPinPrompt = "Vui lòng nhập mã PIN trên TV:",
     pair = "Ghép nối", settings = "Cài đặt", about = "Giới thiệu", developer = "Nhà phát triển", website = "Trang web",
-    language = "Ngôn ngữ", systemDefault = "Mặc định hệ thống", proVersion = "Bản Pro", buyProDesc = "Xóa quảng cáo trọn đời."
+    language = "Ngôn ngữ", systemDefault = "Mặc định hệ thống", proVersion = "Bản Pro", buyProDesc = "Xóa quảng cáo trọn đời.",
+    connecting = "Đang kết nối...", ok = "OK", manageSubscription = "Quản lý đăng ký",
+    restorePurchases = "Khôi phục mua hàng", proLifetime = "Pro (Trọn đời \$3.99)",
+    proSubscription = "Đăng ký Pro (\$1.00/tháng)", back = "Quay lại", home = "Trang chủ"
 )
 
 val jaStrings = AppStrings(
@@ -140,7 +166,10 @@ val jaStrings = AppStrings(
     minsAgo = { "${it}分前" }, hoursAgo = { "${it}時間前" }, daysAgo = { "${it}日前" },
     disconnect = "切断", power = "電源", enterPinPrompt = "TVに表示されたPINを入力してください：",
     pair = "ペアリング", settings = "設定", about = "情報", developer = "開発者", website = "ウェブサイト",
-    language = "言語", systemDefault = "システムデフォルト", proVersion = "プロ版", buyProDesc = "広告を永久に非表示にします。"
+    language = "言語", systemDefault = "システムデフォルト", proVersion = "プロ版", buyProDesc = "広告を永久に非表示にします。",
+    connecting = "接続中...", ok = "OK", manageSubscription = "サブスクリプション管理",
+    restorePurchases = "購入を復元", proLifetime = "プロ (永久 \$3.99)",
+    proSubscription = "プロ定期購読 (\$1.00/月)", back = "戻る", home = "ホーム"
 )
 
 val ruStrings = AppStrings(
@@ -149,7 +178,10 @@ val ruStrings = AppStrings(
     minsAgo = { "${it}м назад" }, hoursAgo = { "${it}ч назад" }, daysAgo = { "${it}д назад" },
     disconnect = "Отключить", power = "Питание", enterPinPrompt = "Введите PIN, отображаемый на ТВ:",
     pair = "Сопряжение", settings = "Настройки", about = "О приложении", developer = "Разработчик", website = "Сайт",
-    language = "Язык", systemDefault = "Системный", proVersion = "Pro-версия", buyProDesc = "Удалить рекламу навсегда."
+    language = "Язык", systemDefault = "Системный", proVersion = "Pro-версия", buyProDesc = "Удалить рекламу навсегда.",
+    connecting = "Подключение...", ok = "OK", manageSubscription = "Управление подпиской",
+    restorePurchases = "Восстановить покупки", proLifetime = "Pro (Навсегда \$3.99)",
+    proSubscription = "Подписка Pro (\$1.00/мес)", back = "Назад", home = "Главная"
 )
 
 val deStrings = AppStrings(
@@ -158,7 +190,10 @@ val deStrings = AppStrings(
     minsAgo = { "Vor ${it}m" }, hoursAgo = { "Vor ${it}h" }, daysAgo = { "Vor ${it}t" },
     disconnect = "Trennen", power = "Ausschalten", enterPinPrompt = "Bitte PIN vom TV eingeben:",
     pair = "Koppeln", settings = "Einstellungen", about = "Über", developer = "Entwickler", website = "Webseite",
-    language = "Sprache", systemDefault = "Systemstandard", proVersion = "Pro-Version", buyProDesc = "Werbung für immer entfernen."
+    language = "Sprache", systemDefault = "Systemstandard", proVersion = "Pro-Version", buyProDesc = "Werbung für immer entfernen.",
+    connecting = "Verbinden...", ok = "OK", manageSubscription = "Abo verwalten",
+    restorePurchases = "Käufe wiederherstellen", proLifetime = "Pro (Einmalig \$3.99)",
+    proSubscription = "Pro-Abo (\$1.00/Monat)", back = "Zurück", home = "Startseite"
 )
 
 val klingonStrings = enUsStrings.copy(
@@ -191,7 +226,10 @@ val latinStrings = AppStrings(
     minsAgo = { "Ante ${it}m" }, hoursAgo = { "Ante ${it}h" }, daysAgo = { "Ante ${it}d" },
     disconnect = "Disiunge", power = "Verte", enterPinPrompt = "Scribe PIN exhibitum:",
     pair = "Coniunge", settings = "Optiones", about = "De", developer = "Fictor", website = "Rete",
-    language = "Lingua", systemDefault = "Defalta", proVersion = "Versio Pro", buyProDesc = "Remove praeconia in perpetuum."
+    language = "Lingua", systemDefault = "Defalta", proVersion = "Versio Pro", buyProDesc = "Remove praeconia in perpetuum.",
+    connecting = "Connectens...", ok = "OK", manageSubscription = "Administra subscriptionem",
+    restorePurchases = "Restitue emptiones", proLifetime = "Pro (In perpetuum \$3.99)",
+    proSubscription = "Subscriptio Pro (\$1.00/mense)", back = "Retro", home = "Domus"
 )
 
 val esperantoStrings = AppStrings(
@@ -200,7 +238,10 @@ val esperantoStrings = AppStrings(
     minsAgo = { "Antaŭ ${it}m" }, hoursAgo = { "Antaŭ ${it}h" }, daysAgo = { "Antaŭ ${it}t" },
     disconnect = "Malkonekti", power = "Malŝalti", enterPinPrompt = "Bonvolu enigi la PIN-on:",
     pair = "Parigi", settings = "Agordoj", about = "Pri", developer = "Programisto", website = "Retejo",
-    language = "Lingvo", systemDefault = "Sistema Defaŭlto", proVersion = "Pro-Versio", buyProDesc = "Forigu reklamojn por ĉiam."
+    language = "Lingvo", systemDefault = "Sistema Defaŭlto", proVersion = "Pro-Versio", buyProDesc = "Forigu reklamojn por ĉiam.",
+    connecting = "Konektante...", ok = "OK", manageSubscription = "Administri abonon",
+    restorePurchases = "Restaŭri aĉetojn", proLifetime = "Pro (Por ĉiam \$3.99)",
+    proSubscription = "Pro-Abono (\$1.00/monato)", back = "Reen", home = "Hejmo"
 )
 
 fun getAppStrings(appLanguage: AppLanguage): AppStrings {

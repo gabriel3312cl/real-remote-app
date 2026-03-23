@@ -1,6 +1,7 @@
 package com.remote.app.data.settings
 
 import android.content.SharedPreferences
+import com.remote.app.domain.PrefsKeys
 import com.remote.app.domain.repository.SettingsRepository
 import com.remote.app.i18n.AppLanguage
 import javax.inject.Inject
@@ -12,11 +13,12 @@ class SettingsRepositoryImpl @Inject constructor(
 ) : SettingsRepository {
 
     override fun getLanguage(): AppLanguage {
-        val name = prefs.getString("selected_language", "SYSTEM") ?: "SYSTEM"
+        val name = prefs.getString(PrefsKeys.KEY_SELECTED_LANGUAGE, PrefsKeys.DEFAULT_LANGUAGE)
+            ?: PrefsKeys.DEFAULT_LANGUAGE
         return AppLanguage.valueOf(name)
     }
 
     override fun setLanguage(language: AppLanguage) {
-        prefs.edit().putString("selected_language", language.name).apply()
+        prefs.edit().putString(PrefsKeys.KEY_SELECTED_LANGUAGE, language.name).apply()
     }
 }

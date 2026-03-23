@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.android.billingclient.api.*
+import com.remote.app.BuildConfig
 import com.remote.app.domain.repository.BillingRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,9 @@ class BillingManagerImpl @Inject constructor(
                     }
                 }
             }
-            override fun onBillingServiceDisconnected() {}
+            override fun onBillingServiceDisconnected() {
+                if (BuildConfig.DEBUG) Log.w(TAG, "Billing service disconnected")
+            }
         })
     }
 
@@ -119,7 +122,7 @@ class BillingManagerImpl @Inject constructor(
                 handlePurchase(purchase)
             }
         } else {
-            Log.e("Billing", "Purchase error: ${billingResult.responseCode}")
+            if (BuildConfig.DEBUG) Log.e(TAG, "Purchase error: ${billingResult.responseCode}")
         }
     }
 
@@ -134,5 +137,9 @@ class BillingManagerImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "BillingManager"
     }
 }

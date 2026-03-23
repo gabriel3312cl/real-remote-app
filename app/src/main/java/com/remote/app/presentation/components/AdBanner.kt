@@ -7,6 +7,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.remote.app.BuildConfig
 
 @Composable
 fun AdBanner(modifier: Modifier = Modifier) {
@@ -14,7 +15,7 @@ fun AdBanner(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         factory = { context ->
             AdView(context).apply {
-                setAdUnitId("ca-app-pub-3940256099942544/6300978111")
+                setAdUnitId(BuildConfig.ADMOB_BANNER_ID)
                 setAdSize(AdSize.BANNER)
                 val adRequest = AdRequest.Builder().build()
                 loadAd(adRequest)

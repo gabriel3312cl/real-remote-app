@@ -7,6 +7,7 @@ import com.remote.app.data.billing.BillingManagerImpl
 import com.remote.app.data.connection.TVConnectionManagerImpl
 import com.remote.app.data.network.TVDiscoveryManagerImpl
 import com.remote.app.data.settings.SettingsRepositoryImpl
+import com.remote.app.domain.PrefsKeys
 import com.remote.app.domain.repository.BillingRepository
 import com.remote.app.domain.repository.SettingsRepository
 import com.remote.app.domain.repository.TVConnectionRepository
@@ -26,7 +27,7 @@ object AppProviderModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("TVSettings", Context.MODE_PRIVATE)
+        return context.getSharedPreferences(PrefsKeys.PREFS_NAME, Context.MODE_PRIVATE)
     }
 
     @Provides

@@ -105,7 +105,7 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text("OK", color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(strings.ok, color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -120,7 +120,7 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
                 },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBack, contentDescription = strings.back)
             }
             FloatingActionButton(
                 onClick = {
@@ -129,7 +129,7 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
                 },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
-                Icon(Icons.Default.Home, contentDescription = "Home")
+                Icon(Icons.Default.Home, contentDescription = strings.home)
             }
         }
 

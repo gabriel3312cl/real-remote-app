@@ -6,6 +6,8 @@ import com.kunal52.AndroidRemoteContext
 import com.kunal52.AndroidRemoteTv
 import com.kunal52.AndroidTvListener
 import com.kunal52.remote.Remotemessage
+import com.remote.app.BuildConfig
+import com.remote.app.domain.AppConstants
 import com.remote.app.domain.model.ConnectionState
 import com.remote.app.domain.model.DiscoveredTV
 import com.remote.app.domain.repository.TVConnectionRepository
@@ -34,7 +36,7 @@ class TVConnectionManagerImpl @Inject constructor(
 
     init {
         AndroidRemoteContext.getInstance().initialize(context)
-        AndroidRemoteContext.getInstance().clientName = "Minimal TV Remote"
+        AndroidRemoteContext.getInstance().clientName = AppConstants.CLIENT_NAME
     }
 
     override fun connectToTv(tv: DiscoveredTV, scope: CoroutineScope) {
@@ -50,7 +52,7 @@ class TVConnectionManagerImpl @Inject constructor(
                         _connectionState.value = ConnectionState.PAIRING_PIN_REQUESTED
                     }
                     override fun onPaired() {
-                        Log.d("TVConnectionManager", "Paired successfully")
+                        if (BuildConfig.DEBUG) Log.d(TAG, "Paired successfully")
                     }
                     override fun onConnectingToRemote() {
                         _connectionState.value = ConnectionState.CONNECTING
@@ -67,7 +69,7 @@ class TVConnectionManagerImpl @Inject constructor(
                     }
                 })
             } catch (e: Exception) {
-                Log.e("TVConnectionManager", "Connect error", e)
+                if (BuildConfig.DEBUG) Log.e(TAG, "Connect error", e)
                 _errorMessage.value = e.message
                 _connectionState.value = ConnectionState.ERROR
             }
@@ -77,7 +79,13 @@ class TVConnectionManagerImpl @Inject constructor(
     override fun sendSecret(pin: String, scope: CoroutineScope) {
         _connectionState.value = ConnectionState.CONNECTING
         scope.launch(Dispatchers.IO) {
-            androidRemoteTv?.sendSecret(pin)
+            try {
+                androidRemoteTv?.sendSecret(pin)
+            } catch (e: Exception) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "sendSecret error", e)
+                _errorMessage.value = e.message ?: "Invalid PIN"
+                _connectionState.value = ConnectionState.ERROR
+            }
         }
     }
 
@@ -88,7 +96,7 @@ class TVConnectionManagerImpl @Inject constructor(
                     val remoteKeyCode = Remotemessage.RemoteKeyCode.forNumber(keyCode)
                     androidRemoteTv?.sendCommand(remoteKeyCode, Remotemessage.RemoteDirection.SHORT)
                 } catch (e: Exception) {
-                    Log.e("TVConnectionManager", "sendCommand error (Broken pipe / TV slept)", e)
+                    if (BuildConfig.DEBUG) Log.e(TAG, "sendCommand error", e)
                     disconnect(scope)
                 }
             }
@@ -113,5 +121,9 @@ class TVConnectionManagerImpl @Inject constructor(
                 connectToTv(tv, scope)
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "TVConnectionManager"
     }
 }

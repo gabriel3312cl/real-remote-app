@@ -4,6 +4,9 @@ import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.util.Log
+import com.remote.app.BuildConfig
+import com.remote.app.domain.AppConstants
+import com.remote.app.domain.PrefsKeys
 import com.remote.app.domain.model.DiscoveredTV
 import com.remote.app.domain.repository.TVDiscoveryRepository
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +26,7 @@ class TVDiscoveryManagerImpl @Inject constructor(
 
     private val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
     private val serviceType = "_androidtvremote2._tcp."
-    private val prefs = context.getSharedPreferences("TVSettings", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences(PrefsKeys.PREFS_NAME, Context.MODE_PRIVATE)
 
     private val tvsMap = mutableMapOf<String, DiscoveredTV>()
 
@@ -38,9 +41,9 @@ class TVDiscoveryManagerImpl @Inject constructor(
     }
 
     private fun loadSavedTVs(): List<DiscoveredTV> {
-        val saved = prefs.getStringSet("saved_tvs", emptySet()) ?: emptySet()
+        val saved = prefs.getStringSet(PrefsKeys.KEY_SAVED_TVS, emptySet()) ?: emptySet()
         return saved.mapNotNull {
-            val parts = it.split("||")
+            val parts = it.split(AppConstants.TV_DATA_SEPARATOR)
             if (parts.size >= 4) DiscoveredTV(parts[0], parts[1], parts[2].toInt(), parts[3].toLongOrNull() ?: 0L)
             else if (parts.size == 3) DiscoveredTV(parts[0], parts[1], parts[2].toInt(), 0L)
             else null
@@ -48,10 +51,11 @@ class TVDiscoveryManagerImpl @Inject constructor(
     }
 
     private fun saveTV(tv: DiscoveredTV) {
-        val saved = prefs.getStringSet("saved_tvs", emptySet())?.toMutableSet() ?: mutableSetOf()
-        saved.removeAll { it.contains("||${tv.host}||") }
-        saved.add("${tv.name}||${tv.host}||${tv.port}||${tv.lastSeenMillis}")
-        prefs.edit().putStringSet("saved_tvs", saved).apply()
+        val sep = AppConstants.TV_DATA_SEPARATOR
+        val saved = prefs.getStringSet(PrefsKeys.KEY_SAVED_TVS, emptySet())?.toMutableSet() ?: mutableSetOf()
+        saved.removeAll { it.contains("${sep}${tv.host}${sep}") }
+        saved.add("${tv.name}${sep}${tv.host}${sep}${tv.port}${sep}${tv.lastSeenMillis}")
+        prefs.edit().putStringSet(PrefsKeys.KEY_SAVED_TVS, saved).apply()
     }
 
     private fun updateDiscoveredTvs() {
@@ -60,7 +64,7 @@ class TVDiscoveryManagerImpl @Inject constructor(
 
     private fun createListener() = object : NsdManager.DiscoveryListener {
         override fun onDiscoveryStarted(regType: String) {
-            Log.d("TVDiscovery", "Service discovery started")
+            if (BuildConfig.DEBUG) Log.d(TAG, "Service discovery started")
         }
 
         override fun onServiceFound(service: NsdServiceInfo) {
@@ -68,7 +72,7 @@ class TVDiscoveryManagerImpl @Inject constructor(
                 try {
                     nsdManager.resolveService(service, object : NsdManager.ResolveListener {
                         override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-                            Log.e("TVDiscovery", "Resolve failed: $errorCode")
+                            if (BuildConfig.DEBUG) Log.e(TAG, "Resolve failed: $errorCode")
                         }
 
                         override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
@@ -85,7 +89,7 @@ class TVDiscoveryManagerImpl @Inject constructor(
                         }
                     })
                 } catch (e: Exception) {
-                    Log.e("TVDiscovery", "Error resolving service", e)
+                    if (BuildConfig.DEBUG) Log.e(TAG, "Error resolving service", e)
                 }
             }
         }
@@ -95,10 +99,10 @@ class TVDiscoveryManagerImpl @Inject constructor(
             updateDiscoveredTvs()
         }
         override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) {
-            try { nsdManager.stopServiceDiscovery(this) } catch (e: Exception) {}
+            try { nsdManager.stopServiceDiscovery(this) } catch (_: Exception) {}
         }
         override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) {
-            try { nsdManager.stopServiceDiscovery(this) } catch (e: Exception) {}
+            try { nsdManager.stopServiceDiscovery(this) } catch (_: Exception) {}
         }
     }
 
@@ -108,13 +112,13 @@ class TVDiscoveryManagerImpl @Inject constructor(
                 launch {
                     try {
                         val socket = Socket()
-                        socket.connect(InetSocketAddress(tv.host, tv.port), 1500)
+                        socket.connect(InetSocketAddress(tv.host, tv.port), AppConstants.PING_TIMEOUT_MS)
                         socket.close()
                         val updatedTv = tv.copy(lastSeenMillis = System.currentTimeMillis())
                         tvsMap[tv.host] = updatedTv
                         saveTV(updatedTv)
                         updateDiscoveredTvs()
-                    } catch (e: Exception) { /* unreachable */ }
+                    } catch (_: Exception) { /* host unreachable */ }
                 }
             }
         }
@@ -128,7 +132,7 @@ class TVDiscoveryManagerImpl @Inject constructor(
         try {
             nsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
         } catch (e: Exception) {
-            Log.e("TVDiscovery", "Failed to start discovery", e)
+            if (BuildConfig.DEBUG) Log.e(TAG, "Failed to start discovery", e)
         }
     }
 
@@ -137,9 +141,13 @@ class TVDiscoveryManagerImpl @Inject constructor(
             try {
                 nsdManager.stopServiceDiscovery(it)
             } catch (e: Exception) {
-                Log.e("TVDiscovery", "Failed to stop discovery", e)
+                if (BuildConfig.DEBUG) Log.e(TAG, "Failed to stop discovery", e)
             }
             discoveryListener = null
         }
+    }
+
+    companion object {
+        private const val TAG = "TVDiscovery"
     }
 }
