@@ -50,6 +50,11 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.2")
+    
+    // Monetization (Ads & Billing)
+    implementation("com.google.android.gms:play-services-ads:23.0.0")
+    implementation("com.android.billingclient:billing-ktx:6.2.0")
     implementation("androidx.compose.material3:material3")
     implementation("com.google.protobuf:protobuf-java:3.11.4")
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")

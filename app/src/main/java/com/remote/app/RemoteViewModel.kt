@@ -12,6 +12,7 @@ import com.kunal52.remote.Remotemessage
 import com.remote.app.network.DiscoveredTV
 import com.remote.app.network.TVDiscoveryManager
 import com.remote.app.i18n.AppLanguage
+import com.remote.app.billing.BillingManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +34,9 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
         prefs.edit().putString("selected_language", language.name).apply()
         _appLanguage.value = language
     }
+
+    val billingManager = BillingManager(application)
+    val isPro = billingManager.isPro
 
     private val tvDiscoveryManager = TVDiscoveryManager(application)
     
@@ -122,7 +126,12 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
     fun sendCommand(keyCode: Remotemessage.RemoteKeyCode) {
         if (_connectionState.value == ConnectionState.CONNECTED) {
             viewModelScope.launch(Dispatchers.IO) {
-                androidRemoteTv?.sendCommand(keyCode, Remotemessage.RemoteDirection.SHORT)
+                try {
+                    androidRemoteTv?.sendCommand(keyCode, Remotemessage.RemoteDirection.SHORT)
+                } catch (e: Exception) {
+                    Log.e("RemoteViewModel", "sendCommand error (Broken pipe / TV slept)", e)
+                    disconnect()
+                }
             }
         }
     }
