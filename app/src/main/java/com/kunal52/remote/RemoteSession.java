@@ -64,7 +64,7 @@ public class RemoteSession {
 
                 @Override
                 public void onDisconnected() {
-
+                    mRemoteSessionListener.onDisconnected();
                 }
 
                 @Override
@@ -89,7 +89,7 @@ public class RemoteSession {
 
                 @Override
                 public void onError(String message) {
-
+                    mRemoteSessionListener.onError(message);
                 }
 
                 @Override
@@ -142,6 +142,16 @@ public class RemoteSession {
             outputStream.write(mMessageManager.createKeyCommand(remoteKeyCode,remoteDirection));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void disconnect() {
+        try {
+            if (outputStream != null) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

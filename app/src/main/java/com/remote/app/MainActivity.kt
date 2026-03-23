@@ -21,6 +21,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
+import android.view.HapticFeedbackConstants
 import com.kunal52.remote.Remotemessage
 
 class MainActivity : ComponentActivity() {
@@ -46,6 +51,27 @@ fun RemoteApp(viewModel: RemoteViewModel = viewModel()) {
     val discoveredTVs by viewModel.discoveredTVs.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.checkConnectionAndReconnect()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(10000)
+            currentTime = System.currentTimeMillis()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,30 +81,62 @@ fun RemoteApp(viewModel: RemoteViewModel = viewModel()) {
     ) {
         when (connectionState) {
             ConnectionState.DISCONNECTED, ConnectionState.ERROR -> {
+                val isScanning by viewModel.isScanning.collectAsState()
+
                 if (connectionState == ConnectionState.ERROR) {
                     Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(bottom = 16.dp))
                 }
-                Button(onClick = { viewModel.startDiscovery() }, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-                    Text("Scan for TVs", fontSize = 18.sp)
+                
+                Button(
+                    onClick = { viewModel.startDiscovery() }, 
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    enabled = !isScanning
+                ) {
+                    if (isScanning) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text("Scanning...", fontSize = 18.sp)
+                    } else {
+                        Text("Scan for TVs", fontSize = 18.sp)
+                    }
                 }
-            }
-            ConnectionState.DISCOVERING -> {
-                CircularProgressIndicator()
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Searching for TVs on Wi-Fi...")
                 
                 Spacer(modifier = Modifier.height(24.dp))
-                discoveredTVs.forEach { tv ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .clickable { viewModel.connectToTv(tv) },
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(tv.name, fontSize = 20.sp)
-                            Text(tv.host, fontSize = 14.sp, color = Color.Gray)
+                
+                if (discoveredTVs.isEmpty()) {
+                    androidx.compose.material3.Text("No TVs found. Press Scan to find devices on your network.", color = Color.Gray, style = androidx.compose.ui.text.TextStyle(textAlign = androidx.compose.ui.text.style.TextAlign.Center))
+                } else {
+                    discoveredTVs.forEach { tv ->
+                        val diff = currentTime - tv.lastSeenMillis
+                        val isOnline = tv.lastSeenMillis > 0L && diff < 120_000L // 2 minutes threshold
+                        
+                        val timeString = when {
+                            tv.lastSeenMillis == 0L -> "Nunca"
+                            diff < 60_000 -> "Hace unos segs"
+                            diff < 3600_000 -> "Hace ${diff / 60_000}m"
+                            diff < 86400_000 -> "Hace ${diff / 3600_000}h"
+                            else -> "Hace ${diff / 86400_000}d"
+                        }
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .clickable { viewModel.connectToTv(tv) },
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(tv.name, fontSize = 20.sp, color = if (isOnline) MaterialTheme.colorScheme.onSurface else Color.Gray)
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    if (isOnline) {
+                                        Text("Online ($timeString)", fontSize = 12.sp, color = Color.Green)
+                                    } else {
+                                        Text("Offline ($timeString)", fontSize = 12.sp, color = Color.Gray)
+                                    }
+                                }
+                                Text(tv.host, fontSize = 14.sp, color = Color.Gray)
+                            }
                         }
                     }
                 }
@@ -112,12 +170,48 @@ fun RemoteApp(viewModel: RemoteViewModel = viewModel()) {
 }
 
 @Composable
+fun HapticButton(onClick: () -> Unit, content: @Composable () -> Unit) {
+    val view = LocalView.current
+    Box(modifier = Modifier.clickable {
+        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+        onClick()
+    }) {
+        content()
+    }
+}
+
+@Composable
 fun RemoteControlPad(viewModel: RemoteViewModel) {
+    val view = LocalView.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(32.dp),
         modifier = Modifier.padding(16.dp)
     ) {
+        // Top Action Buttons
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp).padding(bottom = 16.dp)
+        ) {
+            FloatingActionButton(
+                onClick = { 
+                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    viewModel.disconnect() 
+                },
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            ) {
+                Icon(Icons.Default.Close, contentDescription = "Disconnect")
+            }
+            FloatingActionButton(
+                onClick = { 
+                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_POWER) 
+                },
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            ) {
+                Text("PWR", modifier = Modifier.padding(horizontal = 8.dp))
+            }
+        }
         // D-PAD
         Box(
             modifier = Modifier
@@ -156,7 +250,10 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
                     .align(Alignment.Center)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
-                    .clickable { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_CENTER) },
+                    .clickable { 
+                        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                        viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_CENTER) 
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text("OK", color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp)
@@ -169,13 +266,19 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
             modifier = Modifier.padding(top = 16.dp)
         ) {
             FloatingActionButton(
-                onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_BACK) },
+                onClick = { 
+                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_BACK) 
+                },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             FloatingActionButton(
-                onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_HOME) },
+                onClick = { 
+                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_HOME) 
+                },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
                 Icon(Icons.Default.Home, contentDescription = "Home")
@@ -188,13 +291,19 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
             modifier = Modifier.padding(top = 16.dp)
         ) {
             FloatingActionButton(
-                onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_DOWN) },
+                onClick = { 
+                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_DOWN) 
+                },
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer
             ) {
                 Text("-", fontSize = 24.sp)
             }
             FloatingActionButton(
-                onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_UP) },
+                onClick = { 
+                    view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_UP) 
+                },
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer
             ) {
                 Text("+", fontSize = 24.sp)
@@ -205,8 +314,12 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
 
 @Composable
 fun ControlButton(modifier: Modifier = Modifier, icon: ImageVector, onClick: () -> Unit) {
+    val view = LocalView.current
     IconButton(
-        onClick = onClick,
+        onClick = { 
+            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            onClick() 
+        },
         modifier = modifier.size(64.dp)
     ) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.White)

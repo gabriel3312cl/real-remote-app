@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 enum class ConnectionState {
-    DISCONNECTED, DISCOVERING, PAIRING_PIN_REQUESTED, CONNECTING, CONNECTED, ERROR
+    DISCONNECTED, PAIRING_PIN_REQUESTED, CONNECTING, CONNECTED, ERROR
 }
 
 class RemoteViewModel(application: Application) : AndroidViewModel(application) {
@@ -27,10 +27,14 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
     private val _connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
     val connectionState: StateFlow<ConnectionState> = _connectionState
     
+    private val _isScanning = MutableStateFlow(false)
+    val isScanning: StateFlow<Boolean> = _isScanning
+    
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
     private var androidRemoteTv: AndroidRemoteTv? = null
+    private var connectedTv: DiscoveredTV? = null
 
     init {
         // Initialize keystore path properly for Android
@@ -39,11 +43,19 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun startDiscovery() {
-        _connectionState.value = ConnectionState.DISCOVERING
-        tvDiscoveryManager.startDiscovery()
+        _connectionState.value = ConnectionState.DISCONNECTED
+        viewModelScope.launch {
+            if (_isScanning.value) return@launch
+            _isScanning.value = true
+            tvDiscoveryManager.startDiscovery()
+            kotlinx.coroutines.delay(5000)
+            tvDiscoveryManager.stopDiscovery()
+            _isScanning.value = false
+        }
     }
 
     fun connectToTv(tv: DiscoveredTV) {
+        connectedTv = tv
         tvDiscoveryManager.stopDiscovery()
         _connectionState.value = ConnectionState.CONNECTING
         
@@ -97,6 +109,21 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
         if (_connectionState.value == ConnectionState.CONNECTED) {
             viewModelScope.launch(Dispatchers.IO) {
                 androidRemoteTv?.sendCommand(keyCode, Remotemessage.RemoteDirection.SHORT)
+            }
+        }
+    }
+    fun disconnect() {
+        viewModelScope.launch(Dispatchers.IO) {
+            androidRemoteTv?.disconnect()
+        }
+        connectedTv = null
+        _connectionState.value = ConnectionState.DISCONNECTED
+    }
+
+    fun checkConnectionAndReconnect() {
+        if (_connectionState.value == ConnectionState.ERROR || _connectionState.value == ConnectionState.DISCONNECTED) {
+            connectedTv?.let { tv ->
+                connectToTv(tv)
             }
         }
     }

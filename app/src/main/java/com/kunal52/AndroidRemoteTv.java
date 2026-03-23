@@ -104,4 +104,10 @@ public class AndroidRemoteTv extends BaseAndroidRemoteTv {
         mPairingSession.provideSecret(code);
     }
 
+    public void disconnect() {
+        if (mRemoteSession != null) {
+            mRemoteSession.disconnect();
+        }
+    }
+
 }

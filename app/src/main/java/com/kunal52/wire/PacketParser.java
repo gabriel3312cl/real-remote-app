@@ -33,10 +33,14 @@ public abstract class PacketParser extends Thread {
 
                 bytesRead = 0;
                 messageBufferReceived(buf);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 isAbort=true;
-                throw new RuntimeException(e);
+                onParserError(e);
             }
+    }
+
+    public void onParserError(Exception e) {
+        e.printStackTrace();
     }
 
 

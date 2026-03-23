@@ -29,19 +29,21 @@ public class RemotePacketParser extends PacketParser {
 
     @Override
     public void messageBufferReceived(byte[] buf) {
-        System.out.println(Arrays.toString(buf));
         Remotemessage.RemoteMessage remoteMessage;
         try {
             remoteMessage = Remotemessage.RemoteMessage.parseFrom(buf);
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException(e);
+            onParserError(e);
+            return;
         }
+
         //Send Ping Response
         if (remoteMessage.hasRemotePingRequest()) {
             try {
                 mOutputStream.write(remoteMessageManager.createPingResponse(remoteMessage.getRemotePingRequest().getVal1()));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                onParserError(e);
+                abort();
             }
         } else if (remoteMessage.hasRemoteStart()) {
             if (!isConnected)
@@ -51,13 +53,18 @@ public class RemotePacketParser extends PacketParser {
             try {
                 mMessageQueue.put(remoteMessage);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                onParserError(e);
             }
         }
+    }
 
-
-        System.out.println(remoteMessage);
-
+    @Override
+    public void onParserError(Exception e) {
+        e.printStackTrace();
+        if (mRemoteListener != null) {
+            mRemoteListener.onError(e.getMessage());
+            mRemoteListener.onDisconnected();
+        }
     }
 
 
