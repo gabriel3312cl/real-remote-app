@@ -1,9 +1,9 @@
 package com.remote.app
 
-import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kunal52.AndroidRemoteContext
 import com.kunal52.AndroidRemoteTv
@@ -13,6 +13,9 @@ import com.remote.app.network.DiscoveredTV
 import com.remote.app.network.TVDiscoveryManager
 import com.remote.app.i18n.AppLanguage
 import com.remote.app.billing.BillingManager
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,8 +25,13 @@ enum class ConnectionState {
     DISCONNECTED, PAIRING_PIN_REQUESTED, CONNECTING, CONNECTED, ERROR
 }
 
-class RemoteViewModel(application: Application) : AndroidViewModel(application) {
-    private val prefs = application.getSharedPreferences("TVSettings", Context.MODE_PRIVATE)
+@HiltViewModel
+class RemoteViewModel @Inject constructor(
+    private val prefs: SharedPreferences,
+    val billingManager: BillingManager,
+    private val tvDiscoveryManager: TVDiscoveryManager,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
     private val _appLanguage = MutableStateFlow(
         AppLanguage.valueOf(prefs.getString("selected_language", "SYSTEM") ?: "SYSTEM")
@@ -35,10 +43,7 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
         _appLanguage.value = language
     }
 
-    val billingManager = BillingManager(application)
     val isPro = billingManager.isPro
-
-    private val tvDiscoveryManager = TVDiscoveryManager(application)
     
     val discoveredTVs = tvDiscoveryManager.discoveredTVs
     
@@ -56,7 +61,7 @@ class RemoteViewModel(application: Application) : AndroidViewModel(application) 
 
     init {
         // Initialize keystore path properly for Android
-        AndroidRemoteContext.getInstance().initialize(application)
+        AndroidRemoteContext.getInstance().initialize(context)
         AndroidRemoteContext.getInstance().clientName = "Minimal TV Remote"
     }
 

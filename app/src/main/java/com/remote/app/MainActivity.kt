@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -39,11 +39,13 @@ import com.android.billingclient.api.BillingClient
 import com.remote.app.billing.AdBanner
 import androidx.compose.ui.platform.LocalContext
 import android.app.Activity
+import dagger.hilt.android.AndroidEntryPoint
 
 val LocalAppStrings = staticCompositionLocalOf<AppStrings> { enUsStrings }
 
 enum class Screen { HOME, SETTINGS }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RemoteApp(viewModel: RemoteViewModel = viewModel()) {
+fun RemoteApp(viewModel: RemoteViewModel = hiltViewModel()) {
     val connectionState by viewModel.connectionState.collectAsState()
     val discoveredTVs by viewModel.discoveredTVs.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
