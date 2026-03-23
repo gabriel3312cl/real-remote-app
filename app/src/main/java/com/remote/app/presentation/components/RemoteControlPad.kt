@@ -5,10 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,12 +40,39 @@ fun HapticButton(onClick: () -> Unit, content: @Composable () -> Unit) {
 fun RemoteControlPad(viewModel: RemoteViewModel) {
     val view = LocalView.current
     val strings = LocalAppStrings.current
+    val latency by viewModel.latencyMs.collectAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(32.dp),
         modifier = Modifier.padding(16.dp)
     ) {
+        // Latency indicator
+        latency?.let { ms ->
+            val color = when {
+                ms < 50 -> Color(0xFF4CAF50)   // Green
+                ms < 150 -> Color(0xFFFFC107)  // Yellow
+                else -> Color(0xFFF44336)      // Red
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(color.copy(alpha = 0.15f))
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("${ms}ms", fontSize = 12.sp, color = color, fontWeight = FontWeight.Medium)
+            }
+        }
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp).padding(bottom = 16.dp)

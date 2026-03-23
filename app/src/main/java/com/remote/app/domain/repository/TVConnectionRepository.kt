@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface TVConnectionRepository {
     val connectionState: StateFlow<ConnectionState>
     val errorMessage: StateFlow<String?>
+    val latencyMs: StateFlow<Long?>
 
     fun connectToTv(tv: DiscoveredTV, scope: CoroutineScope)
     fun sendSecret(pin: String, scope: CoroutineScope)

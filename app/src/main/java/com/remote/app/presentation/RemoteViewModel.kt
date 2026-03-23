@@ -58,6 +58,7 @@ class RemoteViewModel @Inject constructor(
     // --- Connection ---
     val connectionState: StateFlow<ConnectionState> = tvConnectionRepository.connectionState
     val errorMessage: StateFlow<String?> = tvConnectionRepository.errorMessage
+    val latencyMs: StateFlow<Long?> = tvConnectionRepository.latencyMs
 
     fun connectToTv(tv: DiscoveredTV) {
         tvDiscoveryRepository.stopDiscovery()

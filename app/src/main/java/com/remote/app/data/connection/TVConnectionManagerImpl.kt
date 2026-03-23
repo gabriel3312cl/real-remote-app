@@ -32,6 +32,9 @@ class TVConnectionManagerImpl @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     override val errorMessage: StateFlow<String?> = _errorMessage
 
+    private val _latencyMs = MutableStateFlow<Long?>(null)
+    override val latencyMs: StateFlow<Long?> = _latencyMs
+
     private var androidRemoteTv: AndroidRemoteTv? = null
     private var connectedTv: DiscoveredTV? = null
     private var connectJob: Job? = null
@@ -110,7 +113,10 @@ class TVConnectionManagerImpl @Inject constructor(
             scope.launch(Dispatchers.IO) {
                 try {
                     val remoteKeyCode = Remotemessage.RemoteKeyCode.forNumber(keyCode)
+                    val start = System.nanoTime()
                     androidRemoteTv?.sendCommand(remoteKeyCode, Remotemessage.RemoteDirection.SHORT)
+                    val elapsed = (System.nanoTime() - start) / 1_000_000
+                    _latencyMs.value = elapsed
                 } catch (e: Exception) {
                     if (BuildConfig.DEBUG) Log.e(TAG, "sendCommand error", e)
                     disconnect(scope)
