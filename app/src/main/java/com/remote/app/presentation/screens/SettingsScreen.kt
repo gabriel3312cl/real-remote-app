@@ -1,4 +1,4 @@
-package com.remote.app.ui.screens
+package com.remote.app.presentation.screens
 
 import android.app.Activity
 import androidx.compose.foundation.clickable
@@ -17,9 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.billingclient.api.BillingClient
-import com.remote.app.RemoteViewModel
 import com.remote.app.i18n.AppLanguage
-import com.remote.app.ui.theme.LocalAppStrings
+import com.remote.app.presentation.RemoteViewModel
+import com.remote.app.presentation.theme.LocalAppStrings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,16 +49,16 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
         ) {
             Text(strings.language, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             var showLanguageDialog by remember { mutableStateOf(false) }
-            
+
             OutlinedButton(
                 onClick = { showLanguageDialog = true },
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
                 Text("${currentLanguage.displayName} \uD83C\uDF10", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
             }
-            
+
             if (showLanguageDialog) {
                 AlertDialog(
                     onDismissRequest = { showLanguageDialog = false },
@@ -69,18 +69,18 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { 
+                                        .clickable {
                                             viewModel.setAppLanguage(lang)
-                                            showLanguageDialog = false 
+                                            showLanguageDialog = false
                                         }
                                         .padding(vertical = 12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
                                         selected = currentLanguage == lang,
-                                        onClick = { 
+                                        onClick = {
                                             viewModel.setAppLanguage(lang)
-                                            showLanguageDialog = false 
+                                            showLanguageDialog = false
                                         },
                                         colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                                     )
@@ -97,15 +97,15 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
                     }
                 )
             }
-            
+
             Divider(modifier = Modifier.padding(vertical = 24.dp))
-            
+
             val activity = LocalContext.current as Activity
-            
+
             if (isPro) {
                 Text("Pro Version Unlocked! \uD83C\uDF1F", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Green)
                 Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { 
+                Button(onClick = {
                     val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/account/subscriptions?package=${activity.packageName}"))
                     activity.startActivity(intent)
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
@@ -114,28 +114,28 @@ fun SettingsScreen(viewModel: RemoteViewModel, onBack: () -> Unit) {
             } else {
                 Text(strings.proVersion, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
                 Text(strings.buyProDesc, color = Color.Gray, modifier = Modifier.padding(vertical = 8.dp))
-                
-                Button(onClick = { 
-                    viewModel.billingManager.buyProduct(activity, "pro_lifetime_399", BillingClient.ProductType.INAPP) 
+
+                Button(onClick = {
+                    viewModel.billingRepository.buyProduct(activity, "pro_lifetime_399", BillingClient.ProductType.INAPP)
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
                     Text("${strings.proVersion} (Lifetime $3.99)")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = { 
-                    viewModel.billingManager.buyProduct(activity, "pro_monthly_099", BillingClient.ProductType.SUBS) 
+                Button(onClick = {
+                    viewModel.billingRepository.buyProduct(activity, "pro_monthly_099", BillingClient.ProductType.SUBS)
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
                     Text("Pro Subscription ($1.00/mo)")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                OutlinedButton(onClick = { 
-                    viewModel.billingManager.restorePurchases() 
+                OutlinedButton(onClick = {
+                    viewModel.billingRepository.restorePurchases()
                 }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
                     Text("Restore Purchases")
                 }
             }
 
             Divider(modifier = Modifier.padding(vertical = 24.dp))
-            
+
             Text(strings.about, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             Text("${strings.developer}: Squir", color = Color.Gray)

@@ -1,4 +1,4 @@
-package com.remote.app.ui.components
+package com.remote.app.presentation.components
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -19,8 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kunal52.remote.Remotemessage
-import com.remote.app.RemoteViewModel
-import com.remote.app.ui.theme.LocalAppStrings
+import com.remote.app.presentation.RemoteViewModel
+import com.remote.app.presentation.theme.LocalAppStrings
 
 @Composable
 fun HapticButton(onClick: () -> Unit, content: @Composable () -> Unit) {
@@ -37,77 +37,71 @@ fun HapticButton(onClick: () -> Unit, content: @Composable () -> Unit) {
 fun RemoteControlPad(viewModel: RemoteViewModel) {
     val view = LocalView.current
     val strings = LocalAppStrings.current
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(32.dp),
         modifier = Modifier.padding(16.dp)
     ) {
-        // Top Action Buttons
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp).padding(bottom = 16.dp)
         ) {
             FloatingActionButton(
-                onClick = { 
+                onClick = {
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                    viewModel.disconnect() 
+                    viewModel.disconnect()
                 },
                 containerColor = MaterialTheme.colorScheme.errorContainer
             ) {
                 Icon(Icons.Default.Close, contentDescription = strings.disconnect)
             }
             FloatingActionButton(
-                onClick = { 
+                onClick = {
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_POWER) 
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_POWER)
                 },
                 containerColor = MaterialTheme.colorScheme.errorContainer
             ) {
                 Text(strings.power, modifier = Modifier.padding(horizontal = 8.dp))
             }
         }
-        // D-PAD
+
         Box(
             modifier = Modifier
                 .size(250.dp)
                 .clip(CircleShape)
                 .background(Color.DarkGray.copy(alpha = 0.3f))
         ) {
-            // UP
             ControlButton(
                 modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp),
                 icon = Icons.Default.KeyboardArrowUp,
                 onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_UP) }
             )
-            // DOWN
             ControlButton(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp),
                 icon = Icons.Default.KeyboardArrowDown,
                 onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_DOWN) }
             )
-            // LEFT
             ControlButton(
                 modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp),
                 icon = Icons.Default.KeyboardArrowLeft,
                 onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_LEFT) }
             )
-            // RIGHT
             ControlButton(
                 modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp),
                 icon = Icons.Default.KeyboardArrowRight,
                 onClick = { viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_RIGHT) }
             )
-            // CENTER (OK)
             Box(
                 modifier = Modifier
                     .size(80.dp)
                     .align(Alignment.Center)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary)
-                    .clickable { 
+                    .clickable {
                         view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                        viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_CENTER) 
+                        viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_DPAD_CENTER)
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -115,24 +109,23 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
             }
         }
 
-        // Action Buttons
         Row(
             horizontalArrangement = Arrangement.spacedBy(32.dp),
             modifier = Modifier.padding(top = 16.dp)
         ) {
             FloatingActionButton(
-                onClick = { 
+                onClick = {
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_BACK) 
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_BACK)
                 },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             FloatingActionButton(
-                onClick = { 
+                onClick = {
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_HOME) 
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_HOME)
                 },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
@@ -140,24 +133,23 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
             }
         }
 
-        // Volume Controls
         Row(
             horizontalArrangement = Arrangement.spacedBy(32.dp),
             modifier = Modifier.padding(top = 16.dp)
         ) {
             FloatingActionButton(
-                onClick = { 
+                onClick = {
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_DOWN) 
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_DOWN)
                 },
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer
             ) {
                 Text("-", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
             FloatingActionButton(
-                onClick = { 
+                onClick = {
                     view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_UP) 
+                    viewModel.sendCommand(Remotemessage.RemoteKeyCode.KEYCODE_VOLUME_UP)
                 },
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer
             ) {
@@ -171,9 +163,9 @@ fun RemoteControlPad(viewModel: RemoteViewModel) {
 fun ControlButton(modifier: Modifier = Modifier, icon: ImageVector, onClick: () -> Unit) {
     val view = LocalView.current
     IconButton(
-        onClick = { 
+        onClick = {
             view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            onClick() 
+            onClick()
         },
         modifier = modifier.size(64.dp)
     ) {

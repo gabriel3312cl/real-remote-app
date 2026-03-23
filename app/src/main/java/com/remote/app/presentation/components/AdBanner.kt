@@ -1,6 +1,5 @@
-package com.remote.app.billing
+package com.remote.app.presentation.components
 
-import android.content.Context
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,7 +14,6 @@ fun AdBanner(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         factory = { context ->
             AdView(context).apply {
-                // Test Banner Unit ID
                 setAdUnitId("ca-app-pub-3940256099942544/6300978111")
                 setAdSize(AdSize.BANNER)
                 val adRequest = AdRequest.Builder().build()

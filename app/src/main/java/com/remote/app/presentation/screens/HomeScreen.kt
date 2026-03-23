@@ -1,4 +1,4 @@
-package com.remote.app.ui.screens
+package com.remote.app.presentation.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -20,13 +20,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.remote.app.RemoteViewModel
-import com.remote.app.billing.AdBanner
-import com.remote.app.connection.ConnectionState
+import com.remote.app.domain.model.ConnectionState
 import com.remote.app.i18n.getAppStrings
-import com.remote.app.ui.components.RemoteControlPad
-import com.remote.app.ui.theme.LocalAppStrings
-import com.remote.app.ui.theme.Screen
+import com.remote.app.presentation.RemoteViewModel
+import com.remote.app.presentation.components.AdBanner
+import com.remote.app.presentation.components.RemoteControlPad
+import com.remote.app.presentation.theme.LocalAppStrings
+import com.remote.app.presentation.theme.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +36,7 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
     val errorMessage by viewModel.errorMessage.collectAsState()
     val language by viewModel.appLanguage.collectAsState()
     val isPro by viewModel.isPro.collectAsState()
-    
+
     var currentScreen by remember { mutableStateOf(Screen.HOME) }
     val strings = getAppStrings(language)
 
@@ -104,9 +104,9 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
                             if (connectionState == ConnectionState.ERROR) {
                                 Text("${strings.error}: $errorMessage", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(bottom = 16.dp))
                             }
-                            
+
                             Button(
-                                onClick = { viewModel.startDiscovery() }, 
+                                onClick = { viewModel.startDiscovery() },
                                 modifier = Modifier.fillMaxWidth().height(56.dp),
                                 enabled = !isScanning
                             ) {
@@ -118,9 +118,9 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
                                     Text(strings.scanForTvs, fontSize = 18.sp)
                                 }
                             }
-                            
+
                             Spacer(modifier = Modifier.height(24.dp))
-                            
+
                             if (discoveredTVs.isEmpty()) {
                                 Text(strings.noTvsFound, color = Color.Gray, style = androidx.compose.ui.text.TextStyle(textAlign = androidx.compose.ui.text.style.TextAlign.Center))
                             } else {

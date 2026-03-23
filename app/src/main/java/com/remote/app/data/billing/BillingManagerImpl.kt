@@ -1,16 +1,22 @@
-package com.remote.app.billing
+package com.remote.app.data.billing
 
 import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.android.billingclient.api.*
+import com.remote.app.domain.repository.BillingRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class BillingManager(private val context: Context) : PurchasesUpdatedListener {
+@Singleton
+class BillingManagerImpl @Inject constructor(
+    context: Context
+) : BillingRepository, PurchasesUpdatedListener {
 
     private val billingClient = BillingClient.newBuilder(context)
         .setListener(this)
@@ -18,7 +24,7 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
         .build()
 
     private val _isPro = MutableStateFlow(false)
-    val isPro: StateFlow<Boolean> = _isPro
+    override val isPro: StateFlow<Boolean> = _isPro
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -32,10 +38,7 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
                     }
                 }
             }
-            override fun onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to
-                // Google Play by calling the startConnection() method.
-            }
+            override fun onBillingServiceDisconnected() {}
         })
     }
 
@@ -43,7 +46,6 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
-        
         billingClient.queryPurchasesAsync(params) { billingResult, purchases ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 for (purchase in purchases) {
@@ -52,13 +54,6 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
                     }
                 }
             }
-        }
-    }
-
-    fun restorePurchases() {
-        coroutineScope.launch {
-            checkSubscription()
-            checkInApp()
         }
     }
 
@@ -66,7 +61,6 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.INAPP)
             .build()
-        
         billingClient.queryPurchasesAsync(params) { billingResult, purchases ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 for (purchase in purchases) {
@@ -78,7 +72,14 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
         }
     }
 
-    fun buyProduct(activity: Activity, productId: String, productType: String) {
+    override fun restorePurchases() {
+        coroutineScope.launch {
+            checkSubscription()
+            checkInApp()
+        }
+    }
+
+    override fun buyProduct(activity: Activity, productId: String, productType: String) {
         val productList = listOf(
             QueryProductDetailsParams.Product.newBuilder()
                 .setProductId(productId)
@@ -88,11 +89,10 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(productList)
             .build()
-            
+
         billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && productDetailsList.isNotEmpty()) {
                 val productDetails = productDetailsList[0]
-                
                 val productDetailsParamsList = listOf(
                     BillingFlowParams.ProductDetailsParams.newBuilder()
                         .setProductDetails(productDetails)
@@ -105,11 +105,9 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
                         }
                         .build()
                 )
-                
                 val billingFlowParams = BillingFlowParams.newBuilder()
                     .setProductDetailsParamsList(productDetailsParamsList)
                     .build()
-                    
                 billingClient.launchBillingFlow(activity, billingFlowParams)
             }
         }
@@ -131,11 +129,8 @@ class BillingManager(private val context: Context) : PurchasesUpdatedListener {
             if (!purchase.isAcknowledged) {
                 val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                     .setPurchaseToken(purchase.purchaseToken)
-                
                 coroutineScope.launch {
-                    billingClient.acknowledgePurchase(acknowledgePurchaseParams.build()) {
-                        // purchase acknowledged
-                    }
+                    billingClient.acknowledgePurchase(acknowledgePurchaseParams.build()) {}
                 }
             }
         }

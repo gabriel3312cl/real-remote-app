@@ -9,7 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.Modifier
 import com.google.android.gms.ads.MobileAds
-import com.remote.app.ui.screens.HomeScreen
+import com.remote.app.presentation.screens.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

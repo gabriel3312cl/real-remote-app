@@ -1,4 +1,4 @@
-package com.remote.app.ui.theme
+package com.remote.app.presentation.theme
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.remote.app.i18n.AppStrings
