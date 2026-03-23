@@ -1,6 +1,7 @@
 package com.remote.app
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,7 @@ import com.kunal52.AndroidTvListener
 import com.kunal52.remote.Remotemessage
 import com.remote.app.network.DiscoveredTV
 import com.remote.app.network.TVDiscoveryManager
+import com.remote.app.i18n.AppLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +22,18 @@ enum class ConnectionState {
 }
 
 class RemoteViewModel(application: Application) : AndroidViewModel(application) {
+    private val prefs = application.getSharedPreferences("TVSettings", Context.MODE_PRIVATE)
+
+    private val _appLanguage = MutableStateFlow(
+        AppLanguage.valueOf(prefs.getString("selected_language", "SYSTEM") ?: "SYSTEM")
+    )
+    val appLanguage: StateFlow<AppLanguage> = _appLanguage
+
+    fun setAppLanguage(language: AppLanguage) {
+        prefs.edit().putString("selected_language", language.name).apply()
+        _appLanguage.value = language
+    }
+
     private val tvDiscoveryManager = TVDiscoveryManager(application)
     
     val discoveredTVs = tvDiscoveryManager.discoveredTVs
