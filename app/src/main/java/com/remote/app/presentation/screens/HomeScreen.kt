@@ -22,6 +22,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.remote.app.domain.AppConstants
 import com.remote.app.domain.model.ConnectionState
+import com.remote.app.domain.model.ConnectionStep
 import com.remote.app.i18n.getAppStrings
 import com.remote.app.presentation.RemoteViewModel
 import com.remote.app.presentation.components.AdBanner
@@ -103,7 +104,12 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
                             val isScanning by viewModel.isScanning.collectAsState()
 
                             if (connectionState == ConnectionState.ERROR) {
-                                Text("${strings.error}: $errorMessage", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(bottom = 16.dp))
+                                val displayError = if (errorMessage == "Pairing lost or TV rejected connection. Please connect again to re-pair.") {
+                                    strings.pairingLostError
+                                } else {
+                                    errorMessage
+                                }
+                                Text("${strings.error}: $displayError", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(bottom = 16.dp))
                             }
 
                             Button(
@@ -184,9 +190,29 @@ fun HomeScreen(viewModel: RemoteViewModel = hiltViewModel()) {
                             }
                         }
                         ConnectionState.CONNECTING -> {
+                            val connectionStep by viewModel.connectionStep.collectAsState()
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(strings.connecting)
+                            Text(strings.connecting, style = MaterialTheme.typography.titleMedium)
+                            
+                            val stepMessage = when (connectionStep) {
+                                ConnectionStep.Idle -> ""
+                                ConnectionStep.InitiatingConnection -> strings.stepInitiating
+                                ConnectionStep.EstablishingEncryption -> strings.stepEstablishing
+                                ConnectionStep.Authenticating -> strings.stepAuthenticating
+                                ConnectionStep.NegotiatingSession -> strings.stepNegotiating
+                                ConnectionStep.ActivatingRemote -> strings.stepActivating
+                            }
+                            
+                            if (stepMessage.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = stepMessage,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            
                             Spacer(modifier = Modifier.height(24.dp))
                             OutlinedButton(
                                 onClick = { viewModel.cancelPairing() },

@@ -28,18 +28,25 @@ public class AndroidRemoteTv extends BaseAndroidRemoteTv {
             }
 
             @Override
-            public void onSslError()  {
-
+            public void onSslError() {
+                // SSL errors (e.g. expired/invalid cert) — treat as a connection error
+                androidTvListener.onError("SSL error: could not establish secure connection");
             }
 
             @Override
             public void onDisconnected() {
-
+                androidTvListener.onDisconnect();
             }
 
             @Override
             public void onError(String message) {
+                // Forward all RemoteSession errors to the caller
+                androidTvListener.onError(message);
+            }
 
+            @Override
+            public void onStep(String step) {
+                androidTvListener.onConnectionStep(step);
             }
         });
 

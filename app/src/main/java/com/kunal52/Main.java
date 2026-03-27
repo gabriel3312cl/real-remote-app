@@ -57,6 +57,11 @@ public class Main {
             public void onError(String error) {
 
             }
+
+            @Override
+            public void onConnectionStep(String step) {
+                System.out.println("Step: " + step);
+            }
         });
     }
 }

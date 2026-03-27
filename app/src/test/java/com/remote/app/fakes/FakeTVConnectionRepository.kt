@@ -7,10 +7,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+import com.remote.app.domain.model.ConnectionStep
+
 class FakeTVConnectionRepository : TVConnectionRepository {
 
     val _connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
     override val connectionState: StateFlow<ConnectionState> = _connectionState
+
+    val _connectionStep = MutableStateFlow<ConnectionStep>(ConnectionStep.Idle)
+    override val connectionStep: StateFlow<ConnectionStep> = _connectionStep
 
     val _errorMessage = MutableStateFlow<String?>(null)
     override val errorMessage: StateFlow<String?> = _errorMessage

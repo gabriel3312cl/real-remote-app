@@ -60,7 +60,13 @@ data class AppStrings(
     val proLifetime: String,
     val proSubscription: String,
     val back: String,
-    val home: String
+    val home: String,
+    val stepInitiating: String,
+    val stepEstablishing: String,
+    val stepAuthenticating: String,
+    val stepNegotiating: String,
+    val stepActivating: String,
+    val pairingLostError: String
 )
 
 val enUsStrings = AppStrings(
@@ -73,7 +79,11 @@ val enUsStrings = AppStrings(
     proVersion = "Pro Version", buyProDesc = "Remove ads forever with a one-time purchase or monthly sub.",
     connecting = "Connecting...", ok = "OK", manageSubscription = "Manage Subscription",
     restorePurchases = "Restore Purchases", proLifetime = "Pro (Lifetime \$3.99)",
-    proSubscription = "Pro Subscription (\$1.00/mo)", back = "Back", home = "Home"
+    proSubscription = "Pro Subscription (\$1.00/mo)", back = "Back", home = "Home",
+    stepInitiating = "Initiating connection...", stepEstablishing = "Establishing secure connection...",
+    stepAuthenticating = "Authenticating session...", stepNegotiating = "Negotiating capabilities...",
+    stepActivating = "Activating remote control...",
+    pairingLostError = "Pairing lost or TV rejected connection. Please connect again to re-pair."
 )
 
 val enUkStrings = enUsStrings.copy(scanForTvs = "Search for TVs", noTvsFound = "No TVs found. Press Search to locate devices on your network.")
@@ -97,7 +107,11 @@ val esEsStrings = AppStrings(
     proVersion = "Versión Pro", buyProDesc = "Elimina la publicidad para siempre con un pago único o mensual.",
     connecting = "Conectando...", ok = "OK", manageSubscription = "Gestionar suscripción",
     restorePurchases = "Restaurar compras", proLifetime = "Pro (De por vida \$3.99)",
-    proSubscription = "Suscripción Pro (\$1.00/mes)", back = "Atrás", home = "Inicio"
+    proSubscription = "Suscripción Pro (\$1.00/mes)", back = "Atrás", home = "Inicio",
+    stepInitiating = "Iniciando conexión...", stepEstablishing = "Estableciendo conexión segura...",
+    stepAuthenticating = "Autenticando sesión...", stepNegotiating = "Negociando capacidades...",
+    stepActivating = "Activando control remoto...",
+    pairingLostError = "Emparejamiento perdido o conexión rechazada por la TV. Por favor, conéctate de nuevo para re-emparejar."
 )
 val es419Strings = esEsStrings.copy(scanForTvs = "Escanear TVs", noTvsFound = "No se encontraron TVs. Presiona Escanear para hallar dispositivos en la red.", settings = "Configuración")
 val esUsStrings = es419Strings.copy(enterPinPrompt = "Por favor ingrese el PIN de la TV:")
@@ -110,8 +124,12 @@ val frStrings = AppStrings(
     pair = "Associer", settings = "Paramètres", about = "À propos", developer = "Développeur", website = "Site Web",
     language = "Langue", systemDefault = "Par défaut", proVersion = "Version Pro", buyProDesc = "Supprimez les publicités pour toujours.",
     connecting = "Connexion...", ok = "OK", manageSubscription = "Gérer l'abonnement",
-    restorePurchases = "Restaurer les achats", proLifetime = "Pro (À vie \$3.99)",
-    proSubscription = "Abonnement Pro (\$1.00/mois)", back = "Retour", home = "Accueil"
+    restorePurchases = "Restaurar les achats", proLifetime = "Pro (À vie \$3.99)",
+    proSubscription = "Abonnement Pro (\$1.00/mois)", back = "Retour", home = "Accueil",
+    stepInitiating = "Lancement de la connexion...", stepEstablishing = "Établissement d'une connexion sécurisée...",
+    stepAuthenticating = "Authentification de la session...", stepNegotiating = "Négociation des capacités...",
+    stepActivating = "Activation de la télécommande...",
+    pairingLostError = "Appairage perdu ou connexion rejetée par la TV. Veuillez vous reconnecter pour réappairer."
 )
 
 val ptPtStrings = AppStrings(
@@ -123,7 +141,11 @@ val ptPtStrings = AppStrings(
     language = "Idioma", systemDefault = "Predefinição do sistema", proVersion = "Versão Pro", buyProDesc = "Remova anúncios para sempre.",
     connecting = "A ligar...", ok = "OK", manageSubscription = "Gerir subscrição",
     restorePurchases = "Restaurar compras", proLifetime = "Pro (Vitalício \$3.99)",
-    proSubscription = "Subscrição Pro (\$1.00/mês)", back = "Voltar", home = "Início"
+    proSubscription = "Subscrição Pro (\$1.00/mês)", back = "Voltar", home = "Início",
+    stepInitiating = "A iniciar ligação...", stepEstablishing = "A estabelecer ligação segura...",
+    stepAuthenticating = "A autenticar sessão...", stepNegotiating = "A negociar capacidades...",
+    stepActivating = "A ativar comando...",
+    pairingLostError = "Emparelhamento perdido ou ligação rejeitada pela TV. Por favor, ligue novamente para re-emparelhar."
 )
 val ptBrStrings = ptPtStrings.copy(scanForTvs = "Escanear TVs", scanning = "Escaneando...", noTvsFound = "Nenhuma TV encontrada. Pressione Escanear.", settings = "Configurações", developer = "Desenvolvedor")
 
@@ -136,7 +158,11 @@ val zhCnStrings = AppStrings(
     language = "语言", systemDefault = "系统默认", proVersion = "专业版", buyProDesc = "一次性购买彻底移除广告。",
     connecting = "连接中...", ok = "确定", manageSubscription = "管理订阅",
     restorePurchases = "恢复购买", proLifetime = "专业版 (终身 \$3.99)",
-    proSubscription = "专业版订阅 (\$1.00/月)", back = "返回", home = "主页"
+    proSubscription = "专业版订阅 (\$1.00/月)", back = "返回", home = "主页",
+    stepInitiating = "正在发起连接...", stepEstablishing = "正在建立安全连接...",
+    stepAuthenticating = "正在验证会话...", stepNegotiating = "正在协商功能...",
+    stepActivating = "正在激活遥控器...",
+    pairingLostError = "配对丢失或电视拒绝连接。请重新连接以再次配对。"
 )
 val zhTwStrings = zhCnStrings.copy(
     scanForTvs = "掃描電視", scanning = "掃描中...", noTvsFound = "未找到電視。請按掃描查找網路上的設備。",
@@ -157,7 +183,11 @@ val viStrings = AppStrings(
     language = "Ngôn ngữ", systemDefault = "Mặc định hệ thống", proVersion = "Bản Pro", buyProDesc = "Xóa quảng cáo trọn đời.",
     connecting = "Đang kết nối...", ok = "OK", manageSubscription = "Quản lý đăng ký",
     restorePurchases = "Khôi phục mua hàng", proLifetime = "Pro (Trọn đời \$3.99)",
-    proSubscription = "Đăng ký Pro (\$1.00/tháng)", back = "Quay lại", home = "Trang chủ"
+    proSubscription = "Đăng ký Pro (\$1.00/tháng)", back = "Quay lại", home = "Trang chủ",
+    stepInitiating = "Khởi tạo kết nối...", stepEstablishing = "Thiết lập kết nối an toàn...",
+    stepAuthenticating = "Xác thực phiên...", stepNegotiating = "Đàm phán khả năng...",
+    stepActivating = "Kích hoạt điều khiển từ xa...",
+    pairingLostError = "Mất ghép nối hoặc TV từ chối kết nối. Vui lòng kết nối lại để ghép nối."
 )
 
 val jaStrings = AppStrings(
@@ -169,7 +199,11 @@ val jaStrings = AppStrings(
     language = "言語", systemDefault = "システムデフォルト", proVersion = "プロ版", buyProDesc = "広告を永久に非表示にします。",
     connecting = "接続中...", ok = "OK", manageSubscription = "サブスクリプション管理",
     restorePurchases = "購入を復元", proLifetime = "プロ (永久 \$3.99)",
-    proSubscription = "プロ定期購読 (\$1.00/月)", back = "戻る", home = "ホーム"
+    proSubscription = "プロ定期購読 (\$1.00/月)", back = "戻る", home = "ホーム",
+    stepInitiating = "接続を開始しています...", stepEstablishing = "安全な接続を確立しています...",
+    stepAuthenticating = "セッションを認証しています...", stepNegotiating = "機能をネゴシエートしています...",
+    stepActivating = "リモコンをアクティブにしています...",
+    pairingLostError = "ペアリングが失われたか、TVが接続を拒否しました。もう一度接続してペアリングし直してください。"
 )
 
 val ruStrings = AppStrings(
@@ -181,7 +215,11 @@ val ruStrings = AppStrings(
     language = "Язык", systemDefault = "Системный", proVersion = "Pro-версия", buyProDesc = "Удалить рекламу навсегда.",
     connecting = "Подключение...", ok = "OK", manageSubscription = "Управление подпиской",
     restorePurchases = "Восстановить покупки", proLifetime = "Pro (Навсегда \$3.99)",
-    proSubscription = "Подписка Pro (\$1.00/мес)", back = "Назад", home = "Главная"
+    proSubscription = "Подписка Pro (\$1.00/мес)", back = "Назад", home = "Главная",
+    stepInitiating = "Инициализация подключения...", stepEstablishing = "Установка защищенного соединения...",
+    stepAuthenticating = "Аутентификация сеанса...", stepNegotiating = "Согласование возможностей...",
+    stepActivating = "Активация пульта...",
+    pairingLostError = "Сопряжение потеряно или ТВ отклонил подключение. Переподключитесь для повторного сопряжения."
 )
 
 val deStrings = AppStrings(
@@ -193,7 +231,11 @@ val deStrings = AppStrings(
     language = "Sprache", systemDefault = "Systemstandard", proVersion = "Pro-Version", buyProDesc = "Werbung für immer entfernen.",
     connecting = "Verbinden...", ok = "OK", manageSubscription = "Abo verwalten",
     restorePurchases = "Käufe wiederherstellen", proLifetime = "Pro (Einmalig \$3.99)",
-    proSubscription = "Pro-Abo (\$1.00/Monat)", back = "Zurück", home = "Startseite"
+    proSubscription = "Pro-Abo (\$1.00/Monat)", back = "Zurück", home = "Startseite",
+    stepInitiating = "Verbindung wird initiiert...", stepEstablishing = "Sichere Verbindung wird hergestellt...",
+    stepAuthenticating = "Sitzung wird authentifiziert...", stepNegotiating = "Funktionen werden ausgehandelt...",
+    stepActivating = "Fernbedienung wird aktiviert...",
+    pairingLostError = "Kopplung verloren oder TV hat Verbindung abgelehnt. Bitte erneut verbinden, um neu zu koppeln."
 )
 
 val klingonStrings = enUsStrings.copy(
@@ -229,7 +271,11 @@ val latinStrings = AppStrings(
     language = "Lingua", systemDefault = "Defalta", proVersion = "Versio Pro", buyProDesc = "Remove praeconia in perpetuum.",
     connecting = "Connectens...", ok = "OK", manageSubscription = "Administra subscriptionem",
     restorePurchases = "Restitue emptiones", proLifetime = "Pro (In perpetuum \$3.99)",
-    proSubscription = "Subscriptio Pro (\$1.00/mense)", back = "Retro", home = "Domus"
+    proSubscription = "Subscriptio Pro (\$1.00/mense)", back = "Retro", home = "Domus",
+    stepInitiating = "Connexionem incipiens...", stepEstablishing = "Connexionem tutam constituens...",
+    stepAuthenticating = "Sessionem authenticans...", stepNegotiating = "Facultates negotiantes...",
+    stepActivating = "Dominium remotum attollens...",
+    pairingLostError = "Coniugium emissum vel TV connexionem repudiavit. Coniunge iterationem ut denuo copules."
 )
 
 val esperantoStrings = AppStrings(
@@ -241,7 +287,11 @@ val esperantoStrings = AppStrings(
     language = "Lingvo", systemDefault = "Sistema Defaŭlto", proVersion = "Pro-Versio", buyProDesc = "Forigu reklamojn por ĉiam.",
     connecting = "Konektante...", ok = "OK", manageSubscription = "Administri abonon",
     restorePurchases = "Restaŭri aĉetojn", proLifetime = "Pro (Por ĉiam \$3.99)",
-    proSubscription = "Pro-Abono (\$1.00/monato)", back = "Reen", home = "Hejmo"
+    proSubscription = "Pro-Abono (\$1.00/monato)", back = "Reen", home = "Hejmo",
+    stepInitiating = "Kompencante konekton...", stepEstablishing = "Starigante sekuran konekton...",
+    stepAuthenticating = "Aŭtentikigante seancon...", stepNegotiating = "Intertraktante kapablojn...",
+    stepActivating = "Aktivigante teleregilon...",
+    pairingLostError = "Parigo perdiĝis aŭ TV rifuzis konekton. Bonvolu rekonekti por reparigi."
 )
 
 fun getAppStrings(appLanguage: AppLanguage): AppStrings {

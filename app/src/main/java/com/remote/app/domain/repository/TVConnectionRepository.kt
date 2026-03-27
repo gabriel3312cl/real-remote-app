@@ -1,12 +1,14 @@
 package com.remote.app.domain.repository
 
 import com.remote.app.domain.model.ConnectionState
+import com.remote.app.domain.model.ConnectionStep
 import com.remote.app.domain.model.DiscoveredTV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
 interface TVConnectionRepository {
     val connectionState: StateFlow<ConnectionState>
+    val connectionStep: StateFlow<ConnectionStep>
     val errorMessage: StateFlow<String?>
     val latencyMs: StateFlow<Long?>
 

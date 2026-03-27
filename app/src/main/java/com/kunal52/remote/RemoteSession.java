@@ -9,10 +9,12 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class RemoteSession {
 
@@ -21,6 +23,8 @@ public class RemoteSession {
     private final BlockingQueue<Remotemessage.RemoteMessage> mMessageQueue;
 
     private static final int SECRET_POLL_TIMEOUT_MS = 500;
+    private static final int SOCKET_CONNECT_TIMEOUT_MS = 10_000;
+    private static final int MESSAGE_WAIT_TIMEOUT_MS = 15_000;
 
     private static RemoteMessageManager mMessageManager;
 
@@ -45,14 +49,21 @@ public class RemoteSession {
     public void connect() throws GeneralSecurityException, IOException, InterruptedException, PairingException {
 
         try {
+            mRemoteSessionListener.onStep("initiating");
             SSLContext sSLContext = SSLContext.getInstance("TLS");
             sSLContext.init(new KeyStoreManager().getKeyManagers(), new TrustManager[]{new DummyTrustManager()}, new SecureRandom());
             SSLSocketFactory sslsocketfactory = sSLContext.getSocketFactory();
-            SSLSocket sSLSocket = (SSLSocket) sslsocketfactory.createSocket(mHost, mPort);
+            SSLSocket sSLSocket = (SSLSocket) sslsocketfactory.createSocket();
+
+            mRemoteSessionListener.onStep("connecting");
+            sSLSocket.connect(new InetSocketAddress(mHost, mPort), SOCKET_CONNECT_TIMEOUT_MS);
             sSLSocket.setNeedClientAuth(true);
             sSLSocket.setUseClientMode(true);
             sSLSocket.setKeepAlive(true);
             sSLSocket.setTcpNoDelay(true);
+            sSLSocket.setSoTimeout(SOCKET_CONNECT_TIMEOUT_MS);
+
+            mRemoteSessionListener.onStep("handshake");
             sSLSocket.startHandshake();
 
             outputStream = sSLSocket.getOutputStream();
@@ -103,13 +114,14 @@ public class RemoteSession {
                 }
             }).start();
 
+            mRemoteSessionListener.onStep("negotiating");
             Remotemessage.RemoteMessage remoteMessage = waitForMessage();
             logger.info(remoteMessage.toString());
 
             byte[] remoteConfigure = mMessageManager.createRemoteConfigure(622, "ROG Strix G531GT_G531GT", "ASUSTeK COMPUTER INC.", 1, "1");
-
             outputStream.write(remoteConfigure);
 
+            mRemoteSessionListener.onStep("activating");
             waitForMessage();
 
             byte[] remoteActive = mMessageManager.createRemoteActive(622);
@@ -122,8 +134,12 @@ public class RemoteSession {
         }
     }
 
-    Remotemessage.RemoteMessage waitForMessage() throws InterruptedException, PairingException {
-        return mMessageQueue.take();
+    Remotemessage.RemoteMessage waitForMessage() throws InterruptedException, PairingException, IOException {
+        Remotemessage.RemoteMessage msg = mMessageQueue.poll(MESSAGE_WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        if (msg == null) {
+            throw new IOException("Timed out waiting for TV response");
+        }
+        return msg;
     }
 
     public void attemptToReconnect() {
@@ -157,12 +173,11 @@ public class RemoteSession {
 
     public interface RemoteSessionListener {
         void onConnected();
-
         void onSslError() throws GeneralSecurityException, IOException, InterruptedException, PairingException;
-
         void onDisconnected();
-
         void onError(String message);
+        /** Called at each step of the connection handshake for progress reporting. */
+        void onStep(String step);
     }
 
 }
